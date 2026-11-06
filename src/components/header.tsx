@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BrandLockup } from "@/components/brand-lockup";
 import { buttonClasses } from "@/components/button-styles";
 import { nav, type NavHref } from "@/config/site";
+
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
 
 function isActive(pathname: string, href: NavHref) {
   if (href === "/") return pathname === "/";
@@ -25,6 +34,7 @@ export function Header() {
   const panelRef = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
   const titleId = useId();
+  const isClient = useIsClient();
 
   if (menuPath !== pathname) {
     setMenuPath(pathname);
@@ -57,12 +67,12 @@ export function Header() {
     }
 
     wasOpen.current = true;
-    const content = document.getElementById("content");
-    const footer = document.querySelector("footer");
+    const locked = document.querySelectorAll("header, #content, footer, aside");
     const previousOverflow = document.body.style.overflow;
+    const previousTouch = document.body.style.touchAction;
     document.body.style.overflow = "hidden";
-    content?.setAttribute("inert", "");
-    footer?.setAttribute("inert", "");
+    document.body.style.touchAction = "none";
+    locked.forEach((node) => node.setAttribute("inert", ""));
     closeRef.current?.focus();
 
     const onKey = (event: KeyboardEvent) => {
@@ -90,8 +100,10 @@ export function Header() {
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
-      content?.removeAttribute("inert");
-      footer?.removeAttribute("inert");
+      document.body.style.touchAction = previousTouch;
+      document.querySelectorAll("header, #content, footer, aside").forEach((node) => {
+        node.removeAttribute("inert");
+      });
     };
   }, [open]);
 
@@ -153,96 +165,102 @@ export function Header() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            id="mobile-navigation"
-            ref={panelRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            className="fixed inset-0 z-50 flex flex-col bg-ivory lg:hidden"
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduce ? undefined : { opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="flex h-[var(--header-h)] items-center justify-between border-b border-ink/10 px-5 sm:px-8">
-              <BrandLockup />
-              <button
-                ref={closeRef}
-                type="button"
-                className="grid h-11 w-11 place-items-center rounded-full"
-                onClick={() => setOpen(false)}
-              >
-                <span className="sr-only">Close menu</span>
-                <span className="relative block h-4 w-4" aria-hidden="true">
-                  <span className="absolute left-0 top-1/2 h-px w-4 -translate-y-1/2 rotate-45 bg-ink" />
-                  <span className="absolute left-0 top-1/2 h-px w-4 -translate-y-1/2 -rotate-45 bg-ink" />
-                </span>
-              </button>
-            </div>
-            <nav className="flex flex-1 flex-col justify-center px-6 sm:px-10" aria-label="Mobile">
-              <p id={titleId} className="sr-only">
-                Menu
-              </p>
-              <ol>
-                {nav.map((item, index) => {
-                  const active = isActive(pathname, item.href);
-                  return (
-                    <motion.li
-                      key={item.href}
-                      initial={reduce ? false : { opacity: 0, y: 14 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: reduce ? 0 : 0.45,
-                        delay: reduce ? 0 : 0.06 + index * 0.05,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
-                      className="border-b border-ink/10"
+      {isClient
+        ? createPortal(
+            <AnimatePresence>
+              {open ? (
+                <motion.div
+                  id="mobile-navigation"
+                  ref={panelRef}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby={titleId}
+                  className="mobile-nav"
+                  initial={reduce ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={reduce ? undefined : { opacity: 0 }}
+                  transition={{ duration: reduce ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className="flex h-[var(--header-h)] items-center justify-between border-b border-ink/10 px-5 sm:px-8">
+                    <BrandLockup />
+                    <button
+                      ref={closeRef}
+                      type="button"
+                      className="grid h-11 w-11 place-items-center rounded-full"
+                      onClick={() => setOpen(false)}
                     >
-                      <Link
-                        href={item.href}
-                        aria-current={active ? "page" : undefined}
-                        className="flex items-baseline gap-4 py-4"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          setOpen(false);
-                          router.push(item.href);
-                        }}
-                      >
-                        <span className="w-8 text-[0.72rem] font-semibold tracking-[0.14em] text-taupe-deep">
-                          {item.number}
-                        </span>
-                        <span
-                          className={`font-display text-4xl font-semibold tracking-[-0.04em] sm:text-5xl ${
-                            active ? "text-taupe-deep" : "text-ink"
-                          }`}
-                        >
-                          {item.label}
-                        </span>
-                      </Link>
-                    </motion.li>
-                  );
-                })}
-              </ol>
-            </nav>
-            <div className="px-6 pb-8 sm:px-10">
-              <Link
-                href="/contact"
-                className={buttonClasses("primary", "w-full")}
-                onClick={(event) => {
-                  event.preventDefault();
-                  setOpen(false);
-                  router.push("/contact");
-                }}
-              >
-                Let’s talk HR
-              </Link>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+                      <span className="sr-only">Close menu</span>
+                      <span className="relative block h-4 w-4" aria-hidden="true">
+                        <span className="absolute left-0 top-1/2 h-px w-4 -translate-y-1/2 rotate-45 bg-ink" />
+                        <span className="absolute left-0 top-1/2 h-px w-4 -translate-y-1/2 -rotate-45 bg-ink" />
+                      </span>
+                    </button>
+                  </div>
+                  <nav className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-6 sm:px-10" aria-label="Mobile">
+                    <p id={titleId} className="sr-only">
+                      Menu
+                    </p>
+                    <ol>
+                      {nav.map((item, index) => {
+                        const active = isActive(pathname, item.href);
+                        return (
+                          <motion.li
+                            key={item.href}
+                            initial={reduce ? false : { opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: reduce ? 0 : 0.4,
+                              delay: reduce ? 0 : 0.05 + index * 0.045,
+                              ease: [0.22, 1, 0.36, 1],
+                            }}
+                            className="border-b border-ink/10"
+                          >
+                            <Link
+                              href={item.href}
+                              aria-current={active ? "page" : undefined}
+                              className="flex min-h-14 items-baseline gap-4 py-3"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                setOpen(false);
+                                router.push(item.href);
+                              }}
+                            >
+                              <span className="w-8 text-[0.72rem] font-semibold tracking-[0.14em] text-taupe-deep">
+                                {item.number}
+                              </span>
+                              <span
+                                className={`font-display text-[clamp(2rem,7vw,2.75rem)] font-semibold tracking-[-0.04em] ${
+                                  active ? "text-taupe-deep" : "text-ink"
+                                }`}
+                              >
+                                {item.label}
+                              </span>
+                            </Link>
+                          </motion.li>
+                        );
+                      })}
+                    </ol>
+                  </nav>
+                  <div className="px-6 pb-8 sm:px-10">
+                    <p className="mb-4 text-sm text-taupe-deep">People operations, made simple.</p>
+                    <Link
+                      href="/contact"
+                      className={buttonClasses("primary", "w-full")}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setOpen(false);
+                        router.push("/contact");
+                      }}
+                    >
+                      Let’s talk HR
+                    </Link>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
     </header>
   );
 }

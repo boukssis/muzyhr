@@ -19,7 +19,7 @@ export default function ContactPage() {
             Contact
           </p>
           <h1 className="mt-5 text-ink">
-            <span className="block font-display text-[clamp(2.5rem,3.2vw,3.85rem)] font-semibold uppercase leading-[0.94] tracking-[-0.045em]">
+            <span className="block font-display text-[clamp(2.15rem,8vw,3.85rem)] font-semibold uppercase leading-[0.94] tracking-[-0.04em]">
               Let’s make HR
             </span>
             <span className="mt-3 block font-serif text-[clamp(2.15rem,2.8vw,3.35rem)] italic leading-none tracking-[-0.03em] text-taupe-deep">

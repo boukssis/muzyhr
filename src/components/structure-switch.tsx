@@ -1,46 +1,68 @@
 "use client";
 
 import { useId, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Check } from "lucide-react";
+import { MhrEffect } from "@/components/mhr-effect";
 
-const modes = {
-  without: {
-    label: "Without structure",
-    kicker: "Scattered",
-    points: [
-      "Onboarding changes with whoever is available.",
-      "Documents live across inboxes and shared drives.",
-      "Benefits questions start from scratch each time.",
-      "Important updates depend on one person’s memory.",
-    ],
+const points = [
+  {
+    before: {
+      title: "Inconsistent onboarding",
+      text: "Every employee receives a different experience.",
+    },
+    after: {
+      title: "Consistent onboarding",
+      text: "A clear, repeatable process for every new employee.",
+    },
   },
-  with: {
-    label: "With structure",
-    kicker: "Locked in",
-    points: [
-      "Every new hire follows the same clear path.",
-      "People know where information lives.",
-      "Enrolment and vendors follow a set workflow.",
-      "Communication goes out the same way each time.",
-    ],
+  {
+    before: {
+      title: "Scattered documents",
+      text: "Policies and files are spread across tools and inboxes.",
+    },
+    after: {
+      title: "Organized employee records",
+      text: "Documents are structured and easier to access appropriately.",
+    },
   },
-} as const;
-
-const ease = [0.22, 1, 0.36, 1] as const;
-
-const strokes = [
-  { top: "18%", width: "34%", left: "8%", x: 40, y: 18, r: -18 },
-  { top: "42%", width: "46%", left: "40%", x: -30, y: -12, r: 14 },
-  { top: "68%", width: "28%", left: "14%", x: 24, y: 20, r: 8 },
-  { top: "78%", width: "38%", left: "48%", x: -18, y: -22, r: -11 },
-];
+  {
+    before: {
+      title: "Confusing benefits administration",
+      text: "Important tasks and updates are handled reactively.",
+    },
+    after: {
+      title: "Coordinated benefits processes",
+      text: "Defined workflows for enrolment, communication and administration.",
+    },
+  },
+  {
+    before: {
+      title: "Unclear responsibilities",
+      text: "Processes depend on individuals remembering what to do.",
+    },
+    after: {
+      title: "Clear responsibilities",
+      text: "Documented processes with understandable ownership.",
+    },
+  },
+  {
+    before: {
+      title: "Repeated HR confusion",
+      text: "The same administrative problems keep resurfacing.",
+    },
+    after: {
+      title: "Proactive process improvement",
+      text: "Regular review of workflows and opportunities to improve.",
+    },
+  },
+] as const;
 
 export function StructureSwitch() {
-  const [mode, setMode] = useState<keyof typeof modes>("without");
+  const [mode, setMode] = useState<"before" | "after">("before");
   const reduce = useReducedMotion();
   const baseId = useId();
-  const organized = mode === "with";
-  const current = modes[mode];
+  const organized = mode === "after";
 
   return (
     <div>
@@ -54,7 +76,12 @@ export function StructureSwitch() {
           className="absolute bottom-1 left-1 top-1 w-[calc(50%-4px)] bg-ink transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{ transform: organized ? "translateX(100%)" : "translateX(0)" }}
         />
-        {(Object.keys(modes) as Array<keyof typeof modes>).map((key) => {
+        {(
+          [
+            ["before", "Without structure"],
+            ["after", "With mhr"],
+          ] as const
+        ).map(([key, label]) => {
           const selected = mode === key;
           return (
             <button
@@ -64,12 +91,12 @@ export function StructureSwitch() {
               role="tab"
               aria-selected={selected}
               aria-controls={`${baseId}-panel`}
-              className={`relative z-10 min-h-11 px-3 text-[0.68rem] font-semibold uppercase tracking-[0.12em] transition-colors sm:text-[0.72rem] ${
+              className={`relative z-10 min-h-11 px-2 text-[0.68rem] font-semibold uppercase tracking-[0.12em] transition-colors sm:text-[0.72rem] ${
                 selected ? "text-ivory" : "text-ink-soft hover:text-ink"
               }`}
               onClick={() => setMode(key)}
             >
-              {modes[key].label}
+              {label}
             </button>
           );
         })}
@@ -79,75 +106,44 @@ export function StructureSwitch() {
         role="tabpanel"
         id={`${baseId}-panel`}
         aria-labelledby={`${baseId}-${mode}`}
-        className="mt-4 overflow-hidden border border-ink/10 bg-white"
+        className="mt-6 grid items-center gap-8 lg:grid-cols-2 lg:gap-10"
       >
-        <div className={`relative h-52 overflow-hidden sm:h-60 ${organized ? "bg-charcoal" : "bg-stone"}`}>
-          {strokes.map((stroke) => (
-            <motion.span
-              key={stroke.top}
-              aria-hidden="true"
-              className={`absolute h-px ${organized ? "bg-taupe" : "bg-taupe-deep/70"}`}
-              style={{ top: stroke.top, left: stroke.left, width: stroke.width }}
-              initial={false}
-              animate={
-                reduce || organized
-                  ? { x: 0, y: 0, rotate: 0, opacity: organized ? 0.9 : 0.45 }
-                  : { x: stroke.x, y: stroke.y, rotate: stroke.r, opacity: 0.55 }
-              }
-              transition={{ duration: reduce ? 0 : 0.7, ease }}
-            />
-          ))}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.span
-              aria-hidden="true"
-              className={`font-serif text-[6.5rem] leading-none tracking-[-0.06em] sm:text-[8rem] ${
-                organized ? "text-ivory" : "text-ink"
-              }`}
-              initial={false}
-              animate={
-                reduce || organized
-                  ? { x: 0, y: 0, rotate: 0 }
-                  : { x: -34, y: 26, rotate: -12 }
-              }
-              transition={{ duration: reduce ? 0 : 0.75, ease }}
-            >
-              m
-            </motion.span>
-            <motion.span
-              aria-hidden="true"
-              className={`-ml-1 font-serif text-[6.5rem] italic leading-none tracking-[-0.06em] sm:text-[8rem] ${
-                organized ? "text-taupe" : "text-taupe-deep"
-              }`}
-              initial={false}
-              animate={
-                reduce || organized
-                  ? { x: 0, y: 0, rotate: 0 }
-                  : { x: 42, y: -30, rotate: 11 }
-              }
-              transition={{ duration: reduce ? 0 : 0.75, ease }}
-            >
-              hr
-            </motion.span>
-          </div>
-          <p
-            className={`absolute bottom-4 left-5 text-[0.68rem] font-semibold uppercase tracking-[0.18em] ${
-              organized ? "text-taupe" : "text-taupe-deep"
-            }`}
-          >
-            {current.kicker}
-          </p>
-        </div>
-        <ol className="grid sm:grid-cols-2">
-          {current.points.map((point, index) => (
-            <li key={point} className="border-t border-ink/10 px-5 py-4">
-              <span className="text-[0.68rem] font-semibold tracking-[0.14em] text-taupe-deep">
-                0{index + 1}
-              </span>
-              <p className="mt-2 font-display text-base font-semibold leading-snug tracking-[-0.03em] text-ink sm:text-lg">
-                {point}
-              </p>
-            </li>
-          ))}
+        <MhrEffect clear={organized} />
+        <ol className="border-t border-ink/10">
+          {points.map((point, index) => {
+            const item = point[mode];
+            return (
+              <li key={point.before.title} className="grid grid-cols-[1.75rem_1.25rem_1fr] gap-2 border-b border-ink/10 py-3.5">
+                <span className="pt-1 text-[0.68rem] font-semibold tracking-[0.14em] text-taupe-deep">
+                  0{index + 1}
+                </span>
+                <span className="pt-1" aria-hidden="true">
+                  {organized ? (
+                    <Check className="size-4 text-taupe-deep" strokeWidth={1.75} />
+                  ) : (
+                    <span className="mt-0.5 block size-3.5 rounded-full border border-line" />
+                  )}
+                </span>
+                <div className="grid min-h-[4.6rem]">
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      key={mode}
+                      className="col-start-1 row-start-1"
+                      initial={reduce ? false : { opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={reduce ? undefined : { opacity: 0 }}
+                      transition={{ duration: reduce ? 0 : 0.28 }}
+                    >
+                      <p className="font-display text-base font-semibold leading-snug tracking-[-0.03em] text-ink sm:text-lg">
+                        {item.title}
+                      </p>
+                      <p className="mt-1 text-sm leading-relaxed text-ink-soft">{item.text}</p>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </li>
+            );
+          })}
         </ol>
       </div>
     </div>

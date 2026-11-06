@@ -261,14 +261,14 @@ export function ContactForm({ deliveryEnabled }: { deliveryEnabled: boolean }) {
           disabled={pending}
           aria-busy={pending}
         >
-          {pending ? "Sending…" : "Request a conversation"}
+          {pending ? (deliveryEnabled ? "Sending…" : "Checking…") : "Request a conversation"}
           {pending ? null : (
             <ArrowRight aria-hidden className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           )}
         </button>
         {deliveryEnabled ? null : (
-          <p className="text-sm leading-relaxed text-ink-soft">
-            Email isn’t connected on this preview, so a submission is not delivered. LinkedIn is beside the form if you want to write directly.
+          <p className="max-w-xs text-sm leading-relaxed text-ink-soft">
+            This preview doesn’t email the form. LinkedIn is the direct route.
           </p>
         )}
       </div>

@@ -2,20 +2,11 @@
 
 import { Suspense, useActionState, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { submitInquiry } from "@/app/contact/actions";
 import { buttonClasses } from "@/components/button-styles";
 import { businessSizes, serviceOptions } from "@/config/site";
 import { initialContactState, type ContactInput } from "@/lib/contact";
-
-const fields: { name: keyof ContactInput; label: string; optional?: boolean }[] = [
-  { name: "name", label: "Name" },
-  { name: "company", label: "Company" },
-  { name: "email", label: "Work email" },
-  { name: "phone", label: "Phone", optional: true },
-  { name: "businessSize", label: "Business size", optional: true },
-  { name: "service", label: "Service of interest" },
-  { name: "message", label: "Message" },
-];
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -23,6 +14,23 @@ function FieldError({ id, message }: { id: string; message?: string }) {
     <p id={id} className="mt-2 text-sm text-danger">
       {message}
     </p>
+  );
+}
+
+function Label({
+  htmlFor,
+  children,
+  optional = false,
+}: {
+  htmlFor: string;
+  children: React.ReactNode;
+  optional?: boolean;
+}) {
+  return (
+    <label htmlFor={htmlFor} className="mb-2 block text-sm font-medium text-ink">
+      {children}
+      {optional ? <span className="ml-2 font-normal text-taupe-deep">Optional</span> : null}
+    </label>
   );
 }
 
@@ -39,16 +47,10 @@ function ServiceSelect({ error }: { error?: string }) {
   const valid = serviceOptions.some((item) => item.id === requested) ? requested : "";
   const [service, setService] = useState(valid);
 
-  return (
-    <ServiceSelectField
-      error={error}
-      value={service}
-      onChange={setService}
-    />
-  );
+  return <ServiceField error={error} value={service} onChange={setService} />;
 }
 
-function ServiceSelectField({
+function ServiceField({
   error,
   value,
   onChange,
@@ -59,9 +61,7 @@ function ServiceSelectField({
 }) {
   return (
     <div>
-      <label htmlFor="service" className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-taupe-deep">
-        Service of interest
-      </label>
+      <Label htmlFor="service">Service interested in</Label>
       <select
         id="service"
         name="service"
@@ -85,10 +85,7 @@ function ServiceSelectField({
 }
 
 export function ContactForm({ deliveryEnabled }: { deliveryEnabled: boolean }) {
-  const [state, formAction, pending] = useActionState(
-    submitInquiry,
-    initialContactState,
-  );
+  const [state, formAction, pending] = useActionState(submitInquiry, initialContactState);
 
   useEffect(() => {
     if (state.status !== "invalid" || !state.fieldErrors) return;
@@ -101,7 +98,7 @@ export function ContactForm({ deliveryEnabled }: { deliveryEnabled: boolean }) {
   return (
     <form
       action={formAction}
-      className="space-y-7"
+      className="relative space-y-5 border border-ink/10 bg-white p-5 sm:p-8"
       noValidate
       aria-label="Enquiry form"
       onFocus={(event) => rememberOpenedAt(event.currentTarget)}
@@ -109,17 +106,8 @@ export function ContactForm({ deliveryEnabled }: { deliveryEnabled: boolean }) {
         if (node) rememberOpenedAt(node);
       }}
     >
-      {!deliveryEnabled ? (
-        <div className="border border-taupe/50 bg-stone px-4 py-4 text-sm leading-relaxed" role="note">
-          <p className="font-semibold text-ink">Preview only — messages are not delivered</p>
-          <p className="mt-1 text-ink-soft">
-            This form checks that an enquiry is complete, then discards it. Nothing is emailed or stored. Please don’t include confidential employee information.
-          </p>
-        </div>
-      ) : null}
-
       {state.status === "invalid" && state.fieldErrors ? (
-        <div role="alert" className="border border-danger/30 bg-white px-4 py-3 text-sm text-danger">
+        <div role="alert" className="border border-danger/30 bg-ivory px-4 py-3 text-sm text-danger">
           <p className="font-semibold">Please correct the fields below.</p>
           <ul className="mt-2 space-y-1">
             {Object.entries(state.fieldErrors).map(([key, message]) =>
@@ -135,68 +123,94 @@ export function ContactForm({ deliveryEnabled }: { deliveryEnabled: boolean }) {
         </div>
       ) : null}
 
-      {state.status === "demo" || state.status === "sent" || state.status === "failed" ? (
+      {state.status === "sent" || state.status === "failed" || state.status === "demo" ? (
         <div
-          role={state.status === "failed" ? "alert" : "status"}
+          role={state.status === "failed" || state.status === "demo" ? "alert" : "status"}
           className={`border px-4 py-4 text-sm leading-relaxed ${
             state.status === "sent"
-              ? "border-ink/15 bg-white text-ink"
-              : state.status === "failed"
-                ? "border-danger/30 bg-white text-danger"
-                : "border-taupe/50 bg-stone text-ink"
+              ? "border-ink/15 bg-ivory text-ink"
+              : "border-danger/30 bg-ivory text-danger"
           }`}
         >
           <p className="font-semibold">
-            {state.status === "sent"
-              ? "Message sent"
-              : state.status === "demo"
-                ? "Nothing was sent"
-                : "Message not sent"}
+            {state.status === "sent" ? "Message sent" : "Nothing was sent"}
           </p>
           {state.message ? <p className="mt-1">{state.message}</p> : null}
         </div>
       ) : null}
 
-      <div className="grid gap-7 sm:grid-cols-2">
-        {fields.slice(0, 4).map((field) => (
-          <div key={field.name}>
-            <label htmlFor={field.name} className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-taupe-deep">
-              {field.label}
-              {field.optional ? <span className="ml-2 font-medium normal-case tracking-normal text-ink-soft">Optional</span> : null}
-            </label>
-            <input
-              id={field.name}
-              name={field.name}
-              type={field.name === "email" ? "email" : field.name === "phone" ? "tel" : "text"}
-              inputMode={field.name === "email" ? "email" : field.name === "phone" ? "tel" : undefined}
-              autoComplete={
-                field.name === "name"
-                  ? "name"
-                  : field.name === "company"
-                    ? "organization"
-                    : field.name === "email"
-                      ? "email"
-                      : field.name === "phone"
-                        ? "tel"
-                        : undefined
-              }
-              maxLength={field.name === "name" ? 80 : field.name === "company" ? 120 : field.name === "email" ? 120 : 40}
-              aria-required={field.optional ? undefined : true}
-              aria-invalid={errorFor(field.name) ? true : undefined}
-              aria-describedby={errorFor(field.name) ? `${field.name}-error` : undefined}
-              className="field"
-            />
-            <FieldError id={`${field.name}-error`} message={errorFor(field.name)} />
-          </div>
-        ))}
-      </div>
-
-      <div className="grid gap-7 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="businessSize" className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-taupe-deep">
+          <Label htmlFor="name">Full name</Label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            autoComplete="name"
+            maxLength={80}
+            placeholder="Your full name"
+            aria-required="true"
+            aria-invalid={errorFor("name") ? true : undefined}
+            aria-describedby={errorFor("name") ? "name-error" : undefined}
+            className="field"
+          />
+          <FieldError id="name-error" message={errorFor("name")} />
+        </div>
+        <div>
+          <Label htmlFor="company">Company name</Label>
+          <input
+            id="company"
+            name="company"
+            type="text"
+            autoComplete="organization"
+            maxLength={120}
+            placeholder="Your company"
+            aria-required="true"
+            aria-invalid={errorFor("company") ? true : undefined}
+            aria-describedby={errorFor("company") ? "company-error" : undefined}
+            className="field"
+          />
+          <FieldError id="company-error" message={errorFor("company")} />
+        </div>
+        <div>
+          <Label htmlFor="email">Work email</Label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            maxLength={120}
+            placeholder="name@company.com"
+            aria-required="true"
+            aria-invalid={errorFor("email") ? true : undefined}
+            aria-describedby={errorFor("email") ? "email-error" : undefined}
+            className="field"
+          />
+          <FieldError id="email-error" message={errorFor("email")} />
+        </div>
+        <div>
+          <Label htmlFor="phone" optional>
+            Phone
+          </Label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            maxLength={40}
+            placeholder="Optional"
+            aria-invalid={errorFor("phone") ? true : undefined}
+            aria-describedby={errorFor("phone") ? "phone-error" : undefined}
+            className="field"
+          />
+          <FieldError id="phone-error" message={errorFor("phone")} />
+        </div>
+        <div>
+          <Label htmlFor="businessSize" optional>
             Business size
-            <span className="ml-2 font-medium normal-case tracking-normal text-ink-soft">Optional</span>
-          </label>
+          </Label>
           <select
             id="businessSize"
             name="businessSize"
@@ -214,37 +228,33 @@ export function ContactForm({ deliveryEnabled }: { deliveryEnabled: boolean }) {
           </select>
           <FieldError id="businessSize-error" message={errorFor("businessSize")} />
         </div>
-        <Suspense fallback={<ServiceSelectField error={errorFor("service")} value="" onChange={() => undefined} />}>
+        <Suspense fallback={<ServiceField error={errorFor("service")} value="" onChange={() => undefined} />}>
           <ServiceSelect error={errorFor("service")} />
         </Suspense>
       </div>
 
       <div>
-        <label htmlFor="message" className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-taupe-deep">
-          Message
-        </label>
+        <Label htmlFor="message">Message</Label>
         <textarea
           id="message"
           name="message"
           rows={6}
           maxLength={2000}
+          placeholder="Where do people operations need more structure?"
           aria-required="true"
           aria-invalid={errorFor("message") ? true : undefined}
           aria-describedby={errorFor("message") ? "message-error" : undefined}
-          className="field resize-y"
+          className="field"
         />
         <FieldError id="message-error" message={errorFor("message")} />
       </div>
 
-      <div className="absolute -left-[9999px] h-0 overflow-hidden" aria-hidden="true">
-        <label>
-          Company website
-          <input name="companyWebsite" tabIndex={-1} autoComplete="off" />
-        </label>
+      <div className="pointer-events-none absolute h-px w-px overflow-hidden" aria-hidden="true">
+        <input className="h-px w-px border-0 p-0" name="companyWebsite" tabIndex={-1} autoComplete="off" defaultValue="" />
       </div>
       <input id="openedAt" type="hidden" name="openedAt" defaultValue="" />
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <button
           type="submit"
           className={buttonClasses("primary", "w-full sm:w-auto")}
@@ -252,12 +262,15 @@ export function ContactForm({ deliveryEnabled }: { deliveryEnabled: boolean }) {
           aria-busy={pending}
         >
           {pending ? "Sending…" : "Request a conversation"}
+          {pending ? null : (
+            <ArrowRight aria-hidden className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+          )}
         </button>
-        <p className="text-sm text-ink-soft">
-          {deliveryEnabled
-            ? "Share only what you are comfortable discussing."
-            : "Demonstration mode is on. Submitting will not deliver this message."}
-        </p>
+        {deliveryEnabled ? null : (
+          <p className="text-sm leading-relaxed text-ink-soft">
+            Email isn’t connected on this preview, so a submission is not delivered. LinkedIn is beside the form if you want to write directly.
+          </p>
+        )}
       </div>
     </form>
   );

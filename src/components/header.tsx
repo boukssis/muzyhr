@@ -19,6 +19,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [menuPath, setMenuPath] = useState(pathname);
   const reduce = useReducedMotion();
+  const headerRef = useRef<HTMLElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -29,6 +30,16 @@ export function Header() {
     setMenuPath(pathname);
     setOpen(false);
   }
+
+  useEffect(() => {
+    const header = headerRef.current;
+    const onScroll = () => {
+      header?.classList.toggle("is-scrolled", window.scrollY > 8);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const onResize = () => {
@@ -85,7 +96,7 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink/10 bg-ivory">
+    <header ref={headerRef} className="site-header sticky top-0 z-40">
       <div className="mx-auto flex h-[var(--header-h)] w-full max-w-[80rem] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
         <BrandLockup priority />
         <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
@@ -96,14 +107,14 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] transition-colors ${
+                className={`group relative py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] transition-colors ${
                   active ? "text-ink" : "text-ink-soft hover:text-ink"
                 }`}
               >
                 {item.label}
                 <span
-                  className={`absolute -bottom-1 left-0 h-px bg-taupe transition-all duration-300 ${
-                    active ? "w-full" : "w-0"
+                  className={`absolute -bottom-1 left-0 h-px bg-taupe-deep transition-all duration-300 ${
+                    active ? "w-full" : "w-0 group-hover:w-full"
                   }`}
                 />
               </Link>

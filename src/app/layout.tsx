@@ -11,7 +11,7 @@ import "./globals.css";
 
 const display = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["500", "600"],
+  weight: ["500", "600", "700"],
   variable: "--font-plus-jakarta",
   display: "swap",
 });
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F7F4F0",
+  themeColor: "#F8F5F1",
   width: "device-width",
   initialScale: 1,
 };
@@ -83,7 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Announcement />
         <Suspense
           fallback={
-            <div className="sticky top-0 z-40 flex h-[var(--header-h)] items-center border-b border-ink/10 bg-ivory">
+            <div className="site-header sticky top-0 z-40 flex h-[var(--header-h)] items-center">
               <div className="mx-auto flex w-full max-w-[80rem] px-5 sm:px-8 lg:px-12">
                 <BrandLockup priority />
               </div>

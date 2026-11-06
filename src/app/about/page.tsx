@@ -1,8 +1,6 @@
 import { ButtonLink } from "@/components/button-link";
 import { Container } from "@/components/container";
-import { Eyebrow } from "@/components/eyebrow";
 import { Logo } from "@/components/logo";
-import { PageHeader } from "@/components/page-header";
 import { company, focusAreas } from "@/config/site";
 import { pageMeta } from "@/lib/metadata";
 
@@ -16,82 +14,80 @@ export const metadata = pageMeta({
 export default function AboutPage() {
   return (
     <>
-      <PageHeader
-        eyebrow="About"
-        title="The thinking behind"
-        accent="better people operations."
-      >
-        muzyhr is a founder-led HR consultancy, established in Montréal in 2026.
-      </PageHeader>
+      <header>
+        <Container className="grid gap-10 py-16 sm:py-20 lg:grid-cols-12 lg:items-end lg:py-24">
+          <h1 className="display uppercase text-ink lg:col-span-7">
+            Meet the person
+            <span className="mt-2 block font-serif text-[0.7em] font-normal normal-case italic text-taupe-deep">
+              behind muzyhr.
+            </span>
+          </h1>
+          <p className="max-w-sm text-base leading-relaxed text-ink-soft lg:col-span-4 lg:col-start-9">
+            Founder-led HR consulting, established in Montréal in 2026. Remote support available.
+          </p>
+        </Container>
+      </header>
 
-      <section>
-        <Container className="grid gap-12 py-16 sm:py-24 lg:grid-cols-12 lg:gap-16 lg:py-28">
+      <section className="border-y border-ink/10 bg-stone">
+        <Container className="grid gap-12 py-14 sm:py-20 lg:grid-cols-12 lg:py-24">
           <div className="lg:col-span-4">
-            <Logo className="brand-logo-lg" />
-            <h2 className="mt-8 font-display text-4xl font-semibold tracking-[-0.04em] text-ink">
-              Tamara Siziba
-            </h2>
-            <p className="mt-3 text-sm font-semibold uppercase tracking-[0.16em] text-taupe-deep">
-              {company.role}
-            </p>
-            <dl className="mt-8 space-y-4 text-sm leading-relaxed">
-              <div>
-                <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-taupe-deep">
-                  Practice
-                </dt>
-                <dd className="mt-1 text-ink">Founder-led HR consulting, established in 2026.</dd>
-              </div>
-              <div>
-                <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-taupe-deep">
-                  Location
-                </dt>
-                <dd className="mt-1 text-ink">Montréal, Canada. Remote support available.</dd>
-              </div>
-            </dl>
-            <a
-              href={company.founderLinkedin}
-              className="mt-8 inline-flex text-sm text-ink underline decoration-taupe underline-offset-4 hover:decoration-ink"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Tamara on LinkedIn
-            </a>
+            <div className="border border-ink/10 bg-ivory p-8">
+              <Logo className="brand-logo-lg" />
+              <h2 className="mt-8 font-display text-4xl font-semibold tracking-[-0.04em] text-ink">
+                {company.founder}
+              </h2>
+              <p className="mt-2 text-sm font-medium text-taupe-deep">Founder</p>
+              <p className="mt-6 text-sm leading-relaxed text-ink">
+                Montréal, Canada
+                <span className="mt-1 block text-ink-soft">Working with growing businesses, including remotely.</span>
+              </p>
+              <a
+                href={company.founderLinkedin}
+                className="mt-6 inline-flex text-sm font-medium text-ink underline decoration-taupe underline-offset-4 hover:decoration-ink"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Tamara on LinkedIn
+              </a>
+            </div>
           </div>
-          <div className="max-w-2xl space-y-6 text-base leading-relaxed text-ink-soft sm:text-lg lg:col-span-7 lg:col-start-6">
-            <p className="font-serif text-2xl italic leading-snug text-ink sm:text-3xl">
+          <div className="lg:col-span-7 lg:col-start-6">
+            <p className="font-serif text-2xl italic leading-snug text-ink sm:text-[2rem]">
               After working in benefits and retirement services, Tamara saw how much the employee experience depends on the systems behind it. She created muzyhr to help growing businesses build those systems with clarity and intention.
             </p>
-            <p>
-              Her experience spans Group Benefits, Group Retirement Services, benefits administration, employee communications, and HR and people operations processes. That work made a pattern hard to ignore: small businesses often grow faster than the HR systems supporting them.
-            </p>
-            <p>
-              Policies sit in different places. Onboarding changes from one employee to the next. Benefits administration becomes complicated. Documentation is thin. A process lives in one person’s memory. Vendor coordination is disconnected. HR stays reactive.
-            </p>
-            <p>
-              muzyhr exists to help those businesses establish clearer processes, stronger documentation, organized benefits administration, and people operations that can scale. The consultancy is independent. Clients work directly with Tamara.
-            </p>
+            <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft sm:text-lg">
+              <p>
+                Her experience spans Group Benefits, Group Retirement Services, benefits administration, employee communications, and HR processes. A pattern kept showing up: small businesses often grow faster than the HR systems supporting them.
+              </p>
+              <p>
+                Policies sit in different places. Onboarding changes from one person to the next. Benefits become complicated. A process lives in someone’s memory. HR stays reactive.
+              </p>
+              <p>
+                muzyhr is her response — clearer processes, stronger documentation, organized benefits administration, and people operations that can scale. Clients work directly with Tamara.
+              </p>
+            </div>
+            <div className="mt-10 border-t border-ink/15 pt-6">
+              <h3 className="font-display text-xl font-semibold tracking-[-0.03em] text-ink">
+                A simple belief
+              </h3>
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink-soft">
+                Clear systems make everyday HR easier for the business and for the people in it. The work is practical: documents, workflows, communication, and administration that a growing team can keep using.
+              </p>
+            </div>
           </div>
         </Container>
       </section>
 
-      <section className="border-t border-ink/10 bg-white">
+      <section>
         <Container className="py-16 sm:py-24">
-          <Eyebrow>Professional focus</Eyebrow>
-          <h2 className="mt-5 max-w-xl font-display text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">
-            The areas her work has centred on.
-          </h2>
+          <h2 className="display-sm max-w-md text-ink">Where her work has centred.</h2>
           <ul className="mt-10 grid sm:grid-cols-2">
             {focusAreas.map((area, index) => (
-              <li
-                key={area}
-                className="flex items-baseline gap-4 border-t border-ink/10 py-5"
-              >
+              <li key={area} className="flex items-baseline gap-4 border-t border-ink/10 py-5">
                 <span className="text-[0.72rem] font-semibold tracking-[0.14em] text-taupe-deep">
                   0{index + 1}
                 </span>
-                <span className="font-display text-2xl tracking-[-0.03em] text-ink">
-                  {area}
-                </span>
+                <span className="font-display text-2xl tracking-[-0.03em] text-ink">{area}</span>
               </li>
             ))}
           </ul>
@@ -99,14 +95,9 @@ export default function AboutPage() {
       </section>
 
       <section className="theme-dark bg-charcoal text-ivory">
-        <Container className="flex flex-col gap-8 py-16 sm:py-20 lg:flex-row lg:items-end lg:justify-between">
+        <Container className="flex flex-col gap-8 py-16 sm:flex-row sm:items-end sm:justify-between sm:py-20">
           <div className="max-w-xl">
-            <h2 className="font-display text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-              If the business is growing faster than its HR systems, let’s talk.
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-beige">
-              A direct conversation with the founder, about the structure your people operations need next.
-            </p>
+            <h2 className="display-sm">If growth is outrunning the HR systems, let’s talk.</h2>
           </div>
           <ButtonLink href="/contact" variant="light">
             Let’s talk HR

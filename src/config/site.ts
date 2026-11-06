@@ -5,12 +5,18 @@
  * or unverified credentials here.
  */
 export const announcement = {
-  enabled: true,
+  /** Turn on only after Tamara confirms founding-client availability. */
+  enabled: false,
   eyebrow: "Founding client opportunities",
   message:
     "muzyhr is welcoming businesses ready to build stronger HR foundations.",
   cta: "Let's connect",
   href: "/contact" as const,
+};
+
+export const preview = {
+  label: "Concept preview",
+  note: "An unofficial design concept. Not an authorized muzyhr website.",
 };
 
 export const company = {
@@ -44,8 +50,7 @@ export const serviceOptions = [
   { id: "benefits-administration", label: "Benefits Administration" },
   { id: "employee-communications", label: "Employee Communications" },
   { id: "hr-audit", label: "HR Audit & Optimization" },
-  { id: "onboarding-offboarding", label: "Onboarding & Offboarding" },
-  { id: "general", label: "General Enquiry" },
+  { id: "other", label: "Other" },
 ] as const;
 
 export type ServiceId = (typeof serviceOptions)[number]["id"];
@@ -62,6 +67,7 @@ export const expertise = [
   "HR operations",
   "Benefits",
   "Onboarding",
+  "Communications",
   "Process improvement",
 ] as const;
 
@@ -69,8 +75,9 @@ export const focusAreas = [
   "Group Benefits",
   "Group Retirement Services",
   "HR Infrastructure",
-  "Employee Onboarding",
-  "People Operations",
+  "Benefits Administration",
+  "Employee Communications",
+  "Onboarding",
   "Process Improvement",
 ] as const;
 
@@ -83,13 +90,13 @@ export const services = [
     description:
       "We help you establish the processes, systems, and documentation that keep your people operations running smoothly.",
     capabilities: [
-      "HR process development",
-      "Employee lifecycle processes",
-      "HR documentation and templates",
-      "Policy and procedure support",
-      "HR audits and process reviews",
-      "Internal HR workflows",
-      "Employee file management",
+      { name: "HR process development", detail: "Give every recurring HR task a clear path to follow." },
+      { name: "Employee lifecycle processes", detail: "Give every new employee a consistent experience from day one." },
+      { name: "HR documentation and templates", detail: "Put the documents people need where they can actually find them." },
+      { name: "Policy and procedure support", detail: "Write the rules of the workplace so they are easy to use." },
+      { name: "HR audits and process reviews", detail: "See what is working before small gaps turn into daily friction." },
+      { name: "Internal HR workflows", detail: "Make handoffs between people obvious, not improvised." },
+      { name: "Employee file management", detail: "Keep employee records organized and easier to maintain." },
     ],
     bestFor: "Growing businesses that need reliable HR structure.",
     homeSummary:
@@ -104,12 +111,12 @@ export const services = [
     description:
       "From employee enrolment to ongoing coordination, we help make benefits administration simpler for businesses and the people they support.",
     capabilities: [
-      "Benefits administration support",
-      "Employee enrolment support",
-      "Benefits communications",
-      "Vendor coordination",
-      "Ongoing administration support",
-      "Benefits-related workflow organization",
+      { name: "Benefits administration support", detail: "Take the day-to-day administration off the founder’s desk." },
+      { name: "Employee enrolment support", detail: "Help new employees get enrolled without a scramble." },
+      { name: "Benefits communications", detail: "Explain the plan in language people can use." },
+      { name: "Vendor coordination", detail: "Keep insurers and providers moving with the business, not around it." },
+      { name: "Ongoing administration support", detail: "Handle the changes that show up after enrolment." },
+      { name: "Benefits-related workflow organization", detail: "Give benefits a repeatable path instead of a one-off inbox thread." },
     ],
     bestFor:
       "Companies offering employee benefits without dedicated in-house HR administration.",
@@ -125,12 +132,12 @@ export const services = [
     description:
       "Clear communication helps employees feel informed and supported. We help businesses communicate important people-related information consistently and professionally.",
     capabilities: [
-      "Employee announcements",
-      "Benefits communications",
-      "HR communications",
-      "Internal resources and guides",
-      "Employee-facing documentation",
-      "Onboarding communications",
+      { name: "Employee announcements", detail: "Share important news in a voice the whole company can follow." },
+      { name: "Benefits communications", detail: "Tell people what their benefits mean, not just that they exist." },
+      { name: "HR communications", detail: "Make people-related updates consistent from one message to the next." },
+      { name: "Internal resources and guides", detail: "Give employees a place to look before they have to ask." },
+      { name: "Employee-facing documentation", detail: "Write the materials people actually receive, clearly." },
+      { name: "Onboarding communications", detail: "Welcome someone with the same clear information every time." },
     ],
     bestFor:
       "Businesses looking to create clearer and more consistent employee experiences.",
@@ -146,13 +153,13 @@ export const services = [
     description:
       "We review existing people operations processes to identify what's working, what's missing, and where practical improvements can make a difference.",
     capabilities: [
-      "HR process audits",
-      "Documentation reviews",
-      "Benefits process reviews",
-      "Workflow assessments",
-      "Improvement recommendations",
-      "Action plans",
-      "Process standardization",
+      { name: "HR process audits", detail: "Look at how people operations actually run, not how they are supposed to." },
+      { name: "Documentation reviews", detail: "Find the policies and guides that are missing, outdated, or hard to find." },
+      { name: "Benefits process reviews", detail: "See where enrolment and administration create avoidable work." },
+      { name: "Workflow assessments", detail: "Identify gaps and make daily HR processes easier to follow." },
+      { name: "Improvement recommendations", detail: "Leave with practical changes, not a pile of observations." },
+      { name: "Action plans", detail: "Put the next steps in an order a growing team can carry out." },
+      { name: "Process standardization", detail: "Turn one-off habits into a way of working the next hire can follow." },
     ],
     bestFor:
       "Businesses that already have HR processes but want stronger organization and consistency.",
@@ -185,28 +192,28 @@ export const steps = [
     title: "Understand",
     summary: "Learn how the business currently manages its people operations.",
     detail:
-      "A conversation about how people operations work today — onboarding, benefits, documents, vendors, and the places where the work still depends on memory.",
+      "Learn how onboarding, benefits, documents, and vendors work today, including what still depends on memory.",
   },
   {
     number: "02",
     title: "Organize",
     summary: "Identify gaps, priorities, and opportunities to improve.",
     detail:
-      "Sort what is already in place from what is missing, then agree on a practical order of work. The aim is a clearer picture, not a long list of everything that could change.",
+      "Separate what is working from what is missing, then agree on a practical order of work.",
   },
   {
     number: "03",
     title: "Build",
     summary: "Develop practical documentation, workflows, and systems.",
     detail:
-      "Create the documents, workflows, and simple systems the business can actually use — templates, guides, and processes written for the way the team works.",
+      "Create the templates, guides, and workflows the team can actually use.",
   },
   {
     number: "04",
     title: "Support",
     summary: "Help implement improvements and strengthen everyday operations.",
     detail:
-      "Stay alongside implementation so the new structure is used. That can include benefits administration, employee communications, and the everyday details that keep operations steady.",
+      "Help put the structure into everyday use, from benefits administration to employee communications.",
   },
 ] as const;
 

@@ -21,7 +21,11 @@ export function ButtonLink({
     <Link href={href} className={buttonClasses(variant, className)}>
       {children}
       {arrow ? (
-        <ArrowRight aria-hidden className="h-4 w-4" strokeWidth={1.25} />
+        <ArrowRight
+          aria-hidden
+          className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+          strokeWidth={1.5}
+        />
       ) : null}
     </Link>
   );
